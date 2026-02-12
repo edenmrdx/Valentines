@@ -27,7 +27,7 @@
         background-size: 400% 400%;
         animation: gradientBG 15s ease infinite;
         font-family: 'Rubik', sans-serif;
-        overflow: hidden; /* Critical to stop shaking from scrollbars */
+        overflow: hidden;
         position: relative;
     }
 
@@ -52,7 +52,6 @@
         position: relative;
         z-index: 100;
         
-        /* FIX FOR SHAKING: Ensure container doesn't resize wildly */
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -70,9 +69,9 @@
     }
 
     p {
-        font-size: 1.3rem;
-        line-height: 1.4;
-        margin-bottom: 25px;
+        font-size: 1.1rem; /* Slightly smaller to fit the longer text */
+        line-height: 1.5;
+        margin-bottom: 20px;
         text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     }
 
@@ -104,18 +103,18 @@
         transition: top 0.2s ease, left 0.2s ease; 
     }
 
-    /* Slideshow Styling - FIXED SHAKING */
+    /* Fixed Image Sizing */
     .couple-photo {
-        width: 250px;       /* Fixed width */
-        height: 300px;      /* Fixed height */
-        object-fit: cover;  /* Crops image to fit box without stretching */
+        width: 250px;       
+        height: 300px;      
+        object-fit: cover;  
         border-radius: 15px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         margin-top: 10px;
         border: 4px solid white;
         transition: opacity 0.5s ease-in-out;
         opacity: 1;
-        background-color: rgba(255,255,255,0.3); /* Placeholder while loading */
+        background-color: rgba(255,255,255,0.3);
     }
 
     .fade-out { opacity: 0; }
@@ -151,15 +150,26 @@
 <body>
 
 <div class="container" id="main-card">
+    
     <div id="screen-1">
-        <h1>לזוזי היקרה ❤️</h1>
-        <p>יש לי שאלה חשובה...</p>
+        <h1>זוז קטן ❤️</h1>
+        <p>
+            אני יודע שאנחנו נמצאים בנקודות שונות על כדור הארץ,
+            אבל בולנטיין הזה אני מרגיש קרוב אלייך מתמיד 
+        </p>
+        <p>
+            חשוב לי שתדעי שאין כמוך בעולם ואת הכל בשבילי, ואני אוהב אותך הכי שיש!
+        </p>
+        <p style="font-weight: bold; margin-bottom: 10px;">
+            ודבר נוסף... יש לי שאלה חשובה...
+        </p>
         <button class="btn btn-yes" onclick="revealMessage()">לחצי כאן</button>
     </div>
 
     <div id="screen-2" class="hidden">
-        <h1>זוזי אהובתי,</h1>
-        <p>את עושה את העולם שלי שמח יותר.<br>האם תהיי הולנטיין שלי?</p>
+        <h1>?</h1>
+        <p style="font-size: 1.5rem; font-weight: bold;">האם תהיי הולנטיין שלי?</p>
+        
         <div style="display: flex; justify-content: center; flex-wrap: wrap; position: relative; width: 100%;">
             <button class="btn btn-yes" onclick="celebrate()">כן! ❤️</button>
             <button class="btn btn-no" id="noBtn" onmouseover="moveButton(event)" ontouchstart="moveButton(event)" onclick="moveButton(event)">לא 😢</button>
@@ -167,11 +177,14 @@
     </div>
 
     <div id="screen-3" class="hidden">
-        <h1>יששש!!! 🎇🥂💐</h1>
+        <h1>ישששש!! 🎇🥂💐</h1>
         
         <img src="us1.jpg" alt="Us" class="couple-photo" id="slideshow">
         
-        <p style="margin-top: 20px;">הולנטיין הכי טוב אי פעם! ❤️</p>
+        <p style="margin-top: 20px;">קבענו לוידיאו דייט ב14/02
+            בשעה 22:00 (שעון הפיליפינים)
+            נדבר, נצחק ונתרגש ביחד
+            ויהיה לנו הולנטיין הכי טוב אי פעם! ❤️</p>
     </div>
 </div>
 
@@ -204,30 +217,24 @@
         
         const btn = document.getElementById('noBtn');
         
-        // 1. Force fixed positioning so it ignores the container
         btn.style.position = 'fixed'; 
         btn.style.zIndex = '9999'; 
 
-        // 2. Get viewport dimensions
         const w = window.innerWidth;
         const h = window.innerHeight;
         
-        // 3. Assume button size (safer than calculating if hidden)
         const btnW = 100; 
         const btnH = 50;
 
-        // 4. Strict Safe Zone (Keep it away from edges)
-        // We ensure it stays at least 20px away from any edge
+        // Strict Safe Zone (20px padding)
         const minX = 20;
         const maxX = w - btnW - 20;
         const minY = 20;
         const maxY = h - btnH - 20;
 
-        // 5. Generate random coordinates
         const newX = Math.random() * (maxX - minX) + minX;
         const newY = Math.random() * (maxY - minY) + minY;
 
-        // 6. Apply
         btn.style.left = newX + 'px';
         btn.style.top = newY + 'px';
     }
