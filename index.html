@@ -184,17 +184,59 @@
     }
 
     .click-heart {
-    position: absolute;
-    pointer-events: none;
-    animation: flyUp 1s ease-out forwards;
-    font-size: 20px;
-    z-index: 9999;
-}
+        position: absolute;
+        pointer-events: none;
+        animation: flyUp 1s ease-out forwards;
+        font-size: 20px;
+        z-index: 9999;
+    }
 
-@keyframes flyUp {
-    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
-    100% { transform: translate(-50%, -150px) scale(1.5); opacity: 0; }
-}
+    @keyframes flyUp {
+        0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+        100% { transform: translate(-50%, -150px) scale(1.5); opacity: 0; }
+    }
+
+    /* === סגנונות חדשים עבור הפיצ'רים שהוספנו === */
+    .countdown-wrapper {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin: 15px 0;
+        background: rgba(255,230,230, 0.5);
+        padding: 10px;
+        border-radius: 10px;
+    }
+    
+    .countdown-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 0.8rem;
+        color: #555;
+    }
+    
+    .countdown-number {
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: #ff6b81;
+    }
+
+    .btn-reasons {
+        background: #a29bfe;
+        color: white;
+        font-size: 1rem;
+        padding: 10px 20px;
+        margin-top: 10px;
+    }
+
+    .reason-text {
+        min-height: 50px;
+        font-size: 1.2rem;
+        color: #6c5ce7;
+        font-weight: bold;
+        margin-top: 10px;
+        transition: opacity 0.3s;
+    }
 </style>
 </head>
 
@@ -237,13 +279,37 @@
         <div class="photo-container">
             <img src="us1.jpg" alt="Us" class="couple-photo" id="slideshow">
         </div>
-        <p style="margin-top: 20px;">
+        
+        <div class="countdown-wrapper">
+            <div class="countdown-item">
+                <span class="countdown-number" id="days">00</span>
+                <span>ימים</span>
+            </div>
+            <div class="countdown-item">
+                <span class="countdown-number" id="hours">00</span>
+                <span>שעות</span>
+            </div>
+            <div class="countdown-item">
+                <span class="countdown-number" id="minutes">00</span>
+                <span>דקות</span>
+            </div>
+            <div class="countdown-item">
+                <span class="countdown-number" id="seconds">00</span>
+                <span>שניות</span>
+            </div>
+        </div>
+
+        <p style="margin-top: 10px; margin-bottom: 10px;">
             ב- 14/02 בשעה 22:00 (שעון הפיליפינים)
             ניפגש לדייט וידאו רומנטי וכיפי
 
             נדבר, נצחק, נתרגש
             ויהיה לנו הולנטיין הכי טוב אי פעם! ❤️
         </p>
+        
+        <button class="btn btn-reasons" onclick="showReason()">למה אני אוהב אותך? 💌</button>
+        <div id="reason-display" class="reason-text"></div>
+
         <button class="btn btn-restart" onclick="restartSite()">מהתחלה 🔄</button>
     </div>
 </div>
@@ -255,7 +321,18 @@
     let emojiIntervals = []; 
     let noClickCount = 0;
     let isNoTransformed = false;
+    let countdownInterval; // משתנה חדש לשעון
     const emojis = ["❤️", "🦦", "🐶", "🐥", "🥰"]; 
+
+    // רשימת הסיבות לאהבה
+    const loveReasons = [
+        "כי את מצחיקה אותי כמו שאף אחת לא יכולה 😂",
+        "בגלל החיוך שלך שעושה לי את היום 🥰",
+        "כי את החברה הכי טובה שלי בעולם 🦦",
+        "בגלל שאת חכמה, מוכשרת ומדהימה 🌟",
+        "כי אני מרגיש בבית כשאני מדבר איתך 🏡",
+        "פשוט כי את... את! ❤️"
+    ];
 
     function revealMessage() {
         document.getElementById('screen-1').classList.add('hidden');
@@ -274,7 +351,6 @@
 
         document.getElementById('screen-2').classList.add('hidden');
         
-        // תיקון: הסתרת כפתור ה-לא באופן ספציפי
         const noBtn = document.getElementById('noBtn');
         if(noBtn) noBtn.classList.add('hidden');
 
@@ -285,6 +361,50 @@
         clearEmojiIntervals();
         startEmojiRain(100); 
         slideshowInterval = setInterval(rotatePhoto, 4000); 
+        startCountdown(); // הפעלת השעון
+    }
+
+    // פונקציה חדשה להצגת סיבות
+    function showReason() {
+        const reasonDiv = document.getElementById('reason-display');
+        const randomReason = loveReasons[Math.floor(Math.random() * loveReasons.length)];
+        
+        reasonDiv.style.opacity = 0;
+        setTimeout(() => {
+            reasonDiv.innerHTML = randomReason;
+            reasonDiv.style.opacity = 1;
+        }, 300);
+    }
+
+    // פונקציה חדשה לשעון
+    function startCountdown() {
+        const currentYear = new Date().getFullYear();
+        // כיוון זמן לפיליפינים 14 לפברואר, 22:00
+        const targetDate = new Date(`Feb 14, ${currentYear} 22:00:00 GMT+0800`).getTime();
+
+        countdownInterval = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            if (distance < 0) {
+                clearInterval(countdownInterval);
+                document.getElementById("days").innerHTML = "00";
+                document.getElementById("hours").innerHTML = "00";
+                document.getElementById("minutes").innerHTML = "00";
+                document.getElementById("seconds").innerHTML = "00";
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("days").innerHTML = days < 10 ? "0" + days : days;
+            document.getElementById("hours").innerHTML = hours < 10 ? "0" + hours : hours;
+            document.getElementById("minutes").innerHTML = minutes < 10 ? "0" + minutes : minutes;
+            document.getElementById("seconds").innerHTML = seconds < 10 ? "0" + seconds : seconds;
+        }, 1000);
     }
 
     function restartSite() {
@@ -293,6 +413,8 @@
         document.getElementById('main-card').classList.remove('solid-mode');
 
         clearInterval(slideshowInterval);
+        clearInterval(countdownInterval); // איפוס שעון
+        document.getElementById('reason-display').innerHTML = ""; // איפוס סיבות
         clearEmojiIntervals();
         
         document.querySelectorAll('.floater').forEach(el => el.remove());
@@ -307,8 +429,6 @@
 
         noBtn.innerHTML = "לא 😞";
         noBtn.classList.remove('transformed');
-        
-        // תיקון: הסרת המחלקה hidden כדי שהכפתור יחזור להופיע
         noBtn.classList.remove('hidden');
         
         noBtn.style.position = 'static'; 
@@ -476,4 +596,3 @@
 
 </body>
 </html>
-
