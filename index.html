@@ -98,7 +98,7 @@
         }, 100);
     }
 
-    /* Generate floating hearts */
+    /* Floating hearts */
     function createHeart() {
         const heart = document.createElement("div");
         heart.classList.add("heart");
@@ -115,7 +115,28 @@
     }
 
     setInterval(createHeart, 300);
+
+    /* Floating Deer & Monkey */
+    function createAnimal(emoji) {
+        const animal = document.createElement("div");
+        animal.classList.add("heart"); // reuse heart styles for animation
+        animal.innerHTML = emoji;
+        animal.style.left = Math.random() * 100 + "vw";
+        animal.style.fontSize = (Math.random() * 30 + 20) + "px";
+        animal.style.animationDuration = (Math.random() * 5 + 5) + "s";
+
+        document.body.appendChild(animal);
+
+        setTimeout(() => {
+            animal.remove();
+        }, 10000);
+    }
+
+    setInterval(() => createAnimal("🦌"), 4000);
+    setInterval(() => createAnimal("🐒"), 5000);
 </script>
+
 
 </body>
 </html>
+
