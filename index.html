@@ -182,6 +182,19 @@
         0% { transform: translateY(0) translateX(0); opacity: 1; }
         100% { transform: translateY(-120vh) translateX(0); opacity: 0; }
     }
+
+    .click-heart {
+    position: absolute;
+    pointer-events: none;
+    animation: flyUp 1s ease-out forwards;
+    font-size: 20px;
+    z-index: 9999;
+}
+
+@keyframes flyUp {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+    100% { transform: translate(-50%, -150px) scale(1.5); opacity: 0; }
+}
 </style>
 </head>
 
@@ -421,10 +434,40 @@
         document.body.appendChild(emoji);
         setTimeout(() => emoji.remove(), duration * 1000);
     }
+
+    document.addEventListener('click', function(e) {
+    const heartCount = 5; 
+    const colors = ['#ff6b81', '#ff4757', '#2ed573', '#ffffff']; 
+
+    for (let i = 0; i < heartCount; i++) {
+        const heart = document.createElement('div');
+        heart.classList.add('click-heart');
+        heart.innerHTML = "❤️";
+        
+        // Random position near the click
+        const offsetX = (Math.random() - 0.5) * 50;
+        const offsetY = (Math.random() - 0.5) * 50;
+        
+        heart.style.left = (e.clientX + offsetX) + 'px';
+        heart.style.top = (e.clientY + offsetY) + 'px';
+        
+        // Random size and rotation
+        const size = Math.random() * 20 + 10;
+        heart.style.fontSize = size + 'px';
+        heart.style.transform = `rotate(${Math.random() * 360}deg)`;
+        
+        document.body.appendChild(heart);
+        
+        setTimeout(() => {
+            heart.remove();
+        }, 1000);
+    }
+});
 </script>
 
 </body>
 </html>
+
 
 
 
