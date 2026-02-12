@@ -168,7 +168,8 @@
 
 <script>
     // --- 1. SLIDESHOW CONFIGURATION ---
-    const photos = ["us1.jpg", "us2.jpg", "us3.jpg", "us4.jpg];
+    // FIXED THE TYPO HERE (added the closing quote)
+    const photos = ["us1.jpg", "us2.jpg", "us3.jpg", "us4.jpg"];
     let photoIndex = 0;
     
     // Preload all images immediately so they don't lag
@@ -208,7 +209,7 @@
         startEmojiRain(100); // Fast rain
         
         // Start the picture rotation
-        setInterval(rotatePhoto, 4500); // Change photo every 3 seconds
+        setInterval(rotatePhoto, 4500); // Change photo every 4.5 seconds
     }
 
     function rotatePhoto() {
@@ -251,4 +252,3 @@
 
 </body>
 </html>
-
