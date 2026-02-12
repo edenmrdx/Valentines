@@ -125,7 +125,6 @@
     .btn-no {
         background: #ff4757;
         color: white;
-        /* RESTORED THE SMOOTH ANIMATION HERE: */
         transition: all 0.3s ease; 
     }
 
@@ -242,7 +241,7 @@
     let photoIndex = 0;
     let slideshowInterval; 
     let emojiIntervals = []; 
-    let yesScale = 1;
+    // yesScale removed from here
     let noClickCount = 0;
     let isNoTransformed = false;
     const emojis = ["❤️", "🦦", "🐶", "💖", "🥰"]; 
@@ -304,10 +303,7 @@
             return;
         }
         
-        if (yesScale < 2.5) {
-            yesScale += 0.15;
-            yesBtn.style.transform = `scale(${yesScale})`;
-        }
+        // --- REMOVED THE GROWING YES BUTTON CODE HERE ---
 
         noBtn.style.position = 'fixed'; 
         noBtn.style.zIndex = '9999'; 
