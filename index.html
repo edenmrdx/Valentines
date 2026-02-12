@@ -241,14 +241,14 @@
     let photoIndex = 0;
     let slideshowInterval; 
     let emojiIntervals = []; 
-    // yesScale removed from here
     let noClickCount = 0;
     let isNoTransformed = false;
     const emojis = ["❤️", "🦦", "🐶", "💖", "🥰"]; 
 
     function revealMessage() {
+        // Play music if not already playing
         const music = document.getElementById('bg-music');
-        if(music) {
+        if(music && music.paused) {
             music.volume = 0.5; 
             music.play().catch(e => console.log("Audio play failed:", e));
         }
@@ -272,7 +272,32 @@
     }
 
     function restartSite() {
-        location.reload(); 
+        // Instead of reloading the page (which stops music), we manually reset the view
+        
+        // 1. Reset Screen Visibility
+        document.getElementById('screen-3').classList.add('hidden');
+        document.getElementById('screen-1').classList.remove('hidden');
+        document.getElementById('main-card').classList.remove('solid-mode');
+
+        // 2. Stop Animations
+        clearInterval(slideshowInterval);
+        clearEmojiIntervals();
+        
+        // Remove existing floating emojis
+        document.querySelectorAll('.floater').forEach(el => el.remove());
+
+        // 3. Reset Variables
+        noClickCount = 0;
+        isNoTransformed = false;
+
+        // 4. Reset "No" Button to original state
+        const noBtn = document.getElementById('noBtn');
+        noBtn.innerHTML = "לא 😢";
+        noBtn.classList.remove('transformed');
+        noBtn.style.position = 'static'; 
+        noBtn.style.left = '';
+        noBtn.style.top = '';
+        noBtn.style.transform = '';
     }
 
     function handleNoClick(e) {
@@ -302,8 +327,6 @@
             noBtn.style.top = '';
             return;
         }
-        
-        // --- REMOVED THE GROWING YES BUTTON CODE HERE ---
 
         noBtn.style.position = 'fixed'; 
         noBtn.style.zIndex = '9999'; 
