@@ -62,6 +62,7 @@
         font-size: 1.2rem;
         line-height: 1.5;
         margin-bottom: 30px;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     }
 
     /* Buttons */
@@ -93,7 +94,24 @@
     .btn-no {
         background: #ff4757;
         color: white;
-        position: relative; /* Allows movement */
+    }
+
+    /* Image Styling */
+    .couple-photo {
+        width: 100%;
+        max-width: 250px;
+        height: auto;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        margin-top: 10px;
+        border: 4px solid white;
+        animation: popIn 0.5s ease;
+    }
+
+    @keyframes popIn {
+        0% { transform: scale(0); opacity: 0; }
+        80% { transform: scale(1.1); opacity: 1; }
+        100% { transform: scale(1); }
     }
 
     /* Visibility Helpers */
@@ -108,12 +126,13 @@
         to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Floating elements */
+    /* Floating elements (emojis) */
     .floater {
         position: absolute;
         bottom: -50px;
         pointer-events: none;
         user-select: none;
+        z-index: 1; /* Behind container usually */
     }
 
     @keyframes floatUp {
@@ -126,28 +145,32 @@
 
 <div class="container" id="main-card">
     <div id="screen-1">
-        <h1>For Zozy ❤️</h1>
+        <h1>Dear Zozy ❤️</h1>
+        <p>I have a question for you...</p>
         <button class="btn btn-primary" onclick="revealMessage()">Click to Open</button>
     </div>
 
     <div id="screen-2" class="hidden">
         <h1>Dear Zozy,</h1>
         <p>You make my world brighter.<br>Will you be my Valentine?</p>
-        <div style="display: flex; justify-content: center; flex-wrap: wrap;">
+        <div style="display: flex; justify-content: center; flex-wrap: wrap; position: relative;">
             <button class="btn btn-yes" onclick="celebrate()">YES! ❤️</button>
             <button class="btn btn-no" id="noBtn" onmouseover="moveButton()" ontouchstart="moveButton()">No 😢</button>
         </div>
     </div>
 
     <div id="screen-3" class="hidden">
-        <h1>YAY!!! 🦦❤️🐶</h1>
-        <p>Best Valentine Ever!</p>
+        <h1>YAY!!! 🎇🥂💐</h1>
+        
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMGIwZGE1/tQAAIV8r04/giphy.gif" alt="Us" class="couple-photo">
+        
+        <p style="margin-top: 20px;">Best Valentine Ever! ❤️</p>
     </div>
 </div>
 
 <script>
     // --- Configuration ---
-    const emojis = ["❤️", "🦦", "🐶", "💖", "🦦"]; // Weighted to show fav animals
+    const emojis = ["❤️", "🦦", "🐶", "💖", "🦦", "🥰"]; 
     let intervalIds = [];
 
     // --- Interaction Functions ---
@@ -159,25 +182,20 @@
         screen2.classList.add('fade-in');
         
         // Start gentle background rain
-        startEmojiRain(1000); 
+        startEmojiRain(800); 
     }
 
     function moveButton() {
         const btn = document.getElementById('noBtn');
-        const container = document.querySelector('.container');
         
-        // Get boundaries so button doesn't fly off screen
-        const containerRect = container.getBoundingClientRect();
-        const btnRect = btn.getBoundingClientRect();
+        // Calculate random position within the viewport
+        // We ensure it stays within 10% to 90% of the screen to avoid edges
+        const x = Math.random() * (window.innerWidth - 100);
+        const y = Math.random() * (window.innerHeight - 50);
 
-        // Calculate new position
-        const newX = Math.random() * (window.innerWidth - btnRect.width - 40) - (window.innerWidth/2 - btnRect.width/2);
-        const newY = Math.random() * (window.innerHeight - btnRect.height - 40) - (window.innerHeight/2 - btnRect.height/2);
-
-        btn.style.position = 'absolute';
-        btn.style.left = '50%';
-        btn.style.top = '50%';
-        btn.style.transform = `translate(${newX}px, ${newY}px)`;
+        btn.style.position = 'fixed'; // Breaks it out of the card layout
+        btn.style.left = x + 'px';
+        btn.style.top = y + 'px';
     }
 
     function celebrate() {
@@ -188,7 +206,7 @@
 
         // Intense celebration mode!
         clearIntervals();
-        startEmojiRain(100); // Very fast rain
+        startEmojiRain(100); // Fast rain
     }
 
     // --- Animation Logic ---
