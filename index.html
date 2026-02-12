@@ -40,13 +40,15 @@
     .container {
         text-align: center;
         color: #fff;
+        /* Default Glass Style */
         background: rgba(255, 255, 255, 0.25);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        
         padding: 30px 20px;
         border-radius: 20px;
         box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        border: 1px solid rgba(255, 255, 255, 0.18);
         width: 90%; 
         max-width: 350px; 
         position: relative;
@@ -57,6 +59,17 @@
         align-items: center;
         min-height: 400px; 
         justify-content: center;
+        transition: all 0.5s ease; /* Smooth transition for background change */
+    }
+
+    /* New class for Screen 3 Solid Background */
+    .container.solid-mode {
+        background: rgba(255, 255, 255, 0.95); /* Solid White */
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        border: none;
+        color: #ff6b81; /* Change text color to match theme since bg is white */
+        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
     }
 
     h1 {
@@ -68,11 +81,18 @@
         line-height: 1;
     }
 
+    /* FIX 2: PRE-LINE makes new lines in code appear as new lines on screen */
     p {
         font-size: 1.1rem; 
         line-height: 1.5;
         margin-bottom: 20px;
         text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        white-space: pre-line; 
+    }
+
+    /* Override text shadow for solid mode */
+    .solid-mode p, .solid-mode h1 {
+        text-shadow: none;
     }
 
     .btn {
@@ -90,7 +110,6 @@
         -webkit-tap-highlight-color: transparent;
         position: relative;
         z-index: 200;
-        /* FIX 1: Prevent shape shifting */
         white-space: nowrap; 
         min-width: 80px; 
     }
@@ -101,15 +120,15 @@
     }
     
     .btn-restart {
-        background: rgba(255, 255, 255, 0.3);
-        border: 2px solid white;
+        background: #ff6b81;
+        border: none;
         color: white;
         margin-top: 15px;
         font-size: 1rem;
     }
     
     .btn-restart:active {
-        background: rgba(255, 255, 255, 0.5);
+        background: #ff4757;
     }
 
     .btn-no {
@@ -118,30 +137,31 @@
         transition: top 0.2s ease, left 0.2s ease; 
     }
 
-    /* FIX 3: Container to prevent vibration/shaking */
     .photo-container {
-        width: 250px;        
+        width: 250px;         
         height: 300px;  
         border-radius: 15px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         margin-top: 10px;
-        border: 4px solid white;
-        background-color: rgba(255,255,255,0.3);
-        overflow: hidden; /* Ensures image stays inside border radius */
-        flex-shrink: 0;   /* Prevents container from squishing */
+        border: 5px solid #fff; /* Thicker white border like a polaroid */
+        background-color: #eee;
+        overflow: hidden; 
+        flex-shrink: 0;   
         position: relative;
+        /* FIX 1: Explicit centering properties */
+        margin-left: auto;
+        margin-right: auto;
     }
 
     .couple-photo {
-        width: 100%;       
-        height: 100%;      
+        width: 100%;        
+        height: 100%;       
         object-fit: cover;  
         transition: opacity 0.5s ease-in-out;
         opacity: 1;
         display: block;
     }
 
-    /* FIX 3: Defined the missing class for the transition */
     .fade-out {
         opacity: 0;
     }
@@ -152,6 +172,14 @@
     
     .fade-in {
         animation: fadeIn 1s forwards;
+    }
+
+    /* FIX 1: Dedicated container styles for screen 3 to ensure alignment */
+    #screen-3 {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
     }
 
     @keyframes fadeIn {
@@ -188,7 +216,9 @@
             אבל בולנטיין הזה אני מרגיש קרוב אלייך מתמיד.
         </p>
         <p>
-            חשוב לי שתדעי שאין כמוך בעולם, את הכל בשבילי, ואני אוהב אותך הכי שיש!
+            חשוב לי שתדעי שאין כמוך בעולם,
+            את הכל בשבילי,
+            ואני אוהב אותך הכי שיש!
         </p>
         <p style="font-weight: bold; margin-bottom: 10px;">
             ודבר נוסף, יש לי שאלה חשובה...
@@ -207,7 +237,7 @@
     </div>
 
     <div id="screen-3" class="hidden">
-        <h1>יש!! 🎇🥂💐</h1>
+        <h1>🎇🥂💐</h1>
         
         <div class="photo-container">
             <img src="us1.jpg" alt="Us" class="couple-photo" id="slideshow">
@@ -215,7 +245,8 @@
         
         <p style="margin-top: 20px;">
             ב- 14/02 בשעה 22:00 (שעון הפיליפינים)
-              נפגש לוידיאו דייט רומנטי וכיפי
+            !נפגש לוידאו דייט רומנטי וכיפי
+            
             נדבר, נצחק, נתרגש
             ויהיה לנו הולנטיין הכי טוב אי פעם! ❤️
         </p>
@@ -259,6 +290,10 @@
         s3.classList.remove('hidden');
         s3.classList.add('fade-in');
 
+        // FIX 3: CHANGE BACKGROUND TO SOLID
+        const card = document.getElementById('main-card');
+        card.classList.add('solid-mode');
+
         clearEmojiIntervals();
         startEmojiRain(100); 
         
@@ -270,6 +305,10 @@
         clearInterval(slideshowInterval);
         clearEmojiIntervals();
 
+        // FIX 3: REVERT BACKGROUND TO GLASS
+        const card = document.getElementById('main-card');
+        card.classList.remove('solid-mode');
+
         document.getElementById('screen-2').classList.add('hidden');
         document.getElementById('screen-3').classList.add('hidden');
         document.getElementById('screen-3').classList.remove('fade-in');
@@ -280,7 +319,7 @@
 
         photoIndex = 0;
         document.getElementById('slideshow').src = photos[0];
-        document.getElementById('slideshow').classList.remove('fade-out'); // Reset opacity
+        document.getElementById('slideshow').classList.remove('fade-out'); 
         
         document.getElementById('noBtn').removeAttribute('style');
     }
@@ -291,19 +330,16 @@
         
         const btn = document.getElementById('noBtn');
         
-        // FIX 2: Get ACTUAL button dimensions (not hardcoded)
         const rect = btn.getBoundingClientRect();
         const btnW = rect.width;
         const btnH = rect.height;
 
-        // Enable fixed positioning
         btn.style.position = 'fixed'; 
         btn.style.zIndex = '9999'; 
 
         const w = window.innerWidth;
         const h = window.innerHeight;
 
-        // FIX 2: Buffer to keep button fully on screen
         const buffer = 20; 
         const minX = buffer;
         const maxX = w - btnW - buffer;
@@ -325,11 +361,9 @@
             photoIndex = (photoIndex + 1) % photos.length; 
             imgElement.src = photos[photoIndex];
             
-            // Wait slightly for image decode, then fade in
             imgElement.onload = () => {
                 imgElement.classList.remove('fade-out');
             };
-            // Fallback in case onload misses (cached)
             setTimeout(() => imgElement.classList.remove('fade-out'), 50);
             
         }, 500); 
@@ -360,4 +394,3 @@
 
 </body>
 </html>
-
