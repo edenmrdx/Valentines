@@ -105,7 +105,7 @@
         border: 4px solid white;
         
         /* Smooth Transition for the image swap */
-        transition: opacity 0.8s ease-in-out;
+        transition: opacity 0.5s ease-in-out;
         opacity: 1;
     }
 
@@ -168,11 +168,11 @@
 
 <script>
     // --- 1. SLIDESHOW CONFIGURATION ---
-    // FIXED THE TYPO HERE (added the closing quote)
+    // Make sure 'us4.jpg' exists in your github, or remove it from this list!
     const photos = ["us1.jpg", "us2.jpg", "us3.jpg", "us4.jpg"];
     let photoIndex = 0;
     
-    // Preload all images immediately so they don't lag
+    // Preload images
     photos.forEach(src => {
         const img = new Image();
         img.src = src;
@@ -206,10 +206,10 @@
         screen3.classList.add('fade-in');
 
         clearIntervals();
-        startEmojiRain(100); // Fast rain
+        startEmojiRain(100); 
         
         // Start the picture rotation
-        setInterval(rotatePhoto, 4500); // Change photo every 4.5 seconds
+        setInterval(rotatePhoto, 3000); 
     }
 
     function rotatePhoto() {
@@ -218,9 +218,9 @@
         // 1. Fade out
         imgElement.classList.add('fade-out');
 
-        // 2. Wait 500ms (half a second), then switch image and fade back in
+        // 2. Wait 500ms, then switch image and fade back in
         setTimeout(() => {
-            photoIndex = (photoIndex + 1) % photos.length; // Loop back to 0
+            photoIndex = (photoIndex + 1) % photos.length; 
             imgElement.src = photos[photoIndex];
             imgElement.classList.remove('fade-out');
         }, 500); 
