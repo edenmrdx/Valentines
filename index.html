@@ -6,6 +6,8 @@
 <title>For Zozy ❤️</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
 
+<link rel="preload" href="us.jpg" as="image">
+
 <style>
     :root {
         --primary: #ff6b81;
@@ -169,6 +171,11 @@
 </div>
 
 <script>
+    // --- 2. JAVASCRIPT PRELOADER ---
+    // This forces the browser to download 'us.jpg' immediately in the background
+    const preloadImage = new Image();
+    preloadImage.src = "us.jpg";
+
     // --- Configuration ---
     const emojis = ["❤️", "🦦", "🐶", "💖", "🦦", "🥰"]; 
     let intervalIds = [];
@@ -188,12 +195,10 @@
     function moveButton() {
         const btn = document.getElementById('noBtn');
         
-        // Calculate random position within the viewport
-        // We ensure it stays within 10% to 90% of the screen to avoid edges
         const x = Math.random() * (window.innerWidth - 100);
         const y = Math.random() * (window.innerHeight - 50);
 
-        btn.style.position = 'fixed'; // Breaks it out of the card layout
+        btn.style.position = 'fixed'; 
         btn.style.left = x + 'px';
         btn.style.top = y + 'px';
     }
@@ -204,7 +209,6 @@
         screen3.classList.remove('hidden');
         screen3.classList.add('fade-in');
 
-        // Intense celebration mode!
         clearIntervals();
         startEmojiRain(100); // Fast rain
     }
@@ -228,17 +232,14 @@
         emoji.classList.add("floater");
         emoji.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
         
-        // Randomize positioning
         emoji.style.left = Math.random() * 100 + "vw";
         emoji.style.fontSize = (Math.random() * 20 + 30) + "px";
         
-        // Randomize animation
-        const duration = Math.random() * 3 + 4; // 4s to 7s
+        const duration = Math.random() * 3 + 4; 
         emoji.style.animation = `floatUp ${duration}s linear forwards`;
         
         document.body.appendChild(emoji);
 
-        // Cleanup
         setTimeout(() => { emoji.remove(); }, duration * 1000);
     }
 </script>
