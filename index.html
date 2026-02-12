@@ -97,17 +97,16 @@
         color: white;
     }
     
-    .btn-primary {
-        background: white;
-        color: var(--primary);
-    }
-
     .btn-restart {
         background: rgba(255, 255, 255, 0.3);
         border: 2px solid white;
         color: white;
         margin-top: 15px;
         font-size: 1rem;
+    }
+    
+    .btn-restart:active {
+        background: rgba(255, 255, 255, 0.5);
     }
 
     .btn-no {
@@ -130,8 +129,9 @@
         background-color: rgba(255,255,255,0.3);
     }
 
-    .fade-out { opacity: 0; }
-    .hidden { display: none; }
+    .hidden {
+        display: none !important; /* Forces hiding to prevent conflicts */
+    }
     
     .fade-in {
         animation: fadeIn 1s forwards;
@@ -201,43 +201,88 @@
 </div>
 
 <script>
-    // --- 1. SLIDESHOW CONFIGURATION ---
+    // --- VARIABLES ---
     const photos = ["us1.jpg", "us2.jpg", "us3.jpg", "us4.jpg"];
     let photoIndex = 0;
-    
-    // Global variable for the slideshow timer so we can stop it later
     let slideshowInterval; 
-    
+    let emojiIntervals = []; // Renamed for clarity
+    const emojis = ["❤️", "🦦", "🐶", "💖", "🦦", "🥰"]; 
+
     // Preload images
     photos.forEach(src => {
         const img = new Image();
         img.src = src;
     });
 
-    // --- 2. MAIN LOGIC ---
-    const emojis = ["❤️", "🦦", "🐶", "💖", "🦦", "🥰"]; 
-    let intervalIds = [];
-
+    // --- STEP 1: REVEAL QUESTION ---
     function revealMessage() {
-        document.getElementById('screen-1').style.display = 'none';
-        const screen2 = document.getElementById('screen-2');
-        screen2.classList.remove('hidden');
-        screen2.classList.add('fade-in');
+        // Hide Screen 1
+        const s1 = document.getElementById('screen-1');
+        s1.classList.add('hidden');
+
+        // Show Screen 2
+        const s2 = document.getElementById('screen-2');
+        s2.classList.remove('hidden');
+        s2.classList.add('fade-in');
+        
         startEmojiRain(800); 
     }
 
-    // --- BUTTON MOVEMENT LOGIC ---
+    // --- STEP 2: CELEBRATE ---
+    function celebrate() {
+        // Hide Screen 2
+        const s2 = document.getElementById('screen-2');
+        s2.classList.add('hidden');
+
+        // Show Screen 3
+        const s3 = document.getElementById('screen-3');
+        s3.classList.remove('hidden');
+        s3.classList.add('fade-in');
+
+        // Stop light rain, start heavy rain
+        clearEmojiIntervals();
+        startEmojiRain(100); 
+        
+        // Start Slideshow
+        slideshowInterval = setInterval(rotatePhoto, 4000); 
+    }
+
+    // --- RESTART LOGIC (FIXED) ---
+    function restartSite() {
+        // 1. Stop all timers
+        clearInterval(slideshowInterval);
+        clearEmojiIntervals();
+
+        // 2. Hide Screens 2 & 3
+        document.getElementById('screen-2').classList.add('hidden');
+        document.getElementById('screen-3').classList.add('hidden');
+        document.getElementById('screen-3').classList.remove('fade-in');
+
+        // 3. Show Screen 1
+        const s1 = document.getElementById('screen-1');
+        s1.classList.remove('hidden');
+        s1.classList.add('fade-in');
+
+        // 4. Reset Data
+        photoIndex = 0;
+        document.getElementById('slideshow').src = photos[0];
+        
+        // 5. Reset "No" Button (Remove fixed positioning)
+        document.getElementById('noBtn').removeAttribute('style');
+    }
+
+    // --- UTILITIES ---
     function moveButton(e) {
         if(e && e.type === 'touchstart') e.preventDefault();
         
         const btn = document.getElementById('noBtn');
         
+        // Enable fixed positioning
         btn.style.position = 'fixed'; 
         btn.style.zIndex = '9999'; 
 
         const w = window.innerWidth;
         const h = window.innerHeight;
-        
         const btnW = 100; 
         const btnH = 50;
 
@@ -253,44 +298,6 @@
         btn.style.top = newY + 'px';
     }
 
-    function celebrate() {
-        document.getElementById('screen-2').style.display = 'none';
-        const screen3 = document.getElementById('screen-3');
-        screen3.classList.remove('hidden');
-        screen3.classList.add('fade-in');
-
-        clearIntervals();
-        startEmojiRain(100); 
-        
-        // Save the interval ID so we can stop it on restart
-        slideshowInterval = setInterval(rotatePhoto, 4000); 
-    }
-
-    // --- NEW RESTART FUNCTION ---
-    function restartSite() {
-        // 1. Stop the slideshow
-        clearInterval(slideshowInterval);
-        
-        // 2. Stop the heavy emoji rain
-        clearIntervals();
-        
-        // 3. Reset Screens
-        document.getElementById('screen-3').classList.add('hidden');
-        document.getElementById('screen-3').classList.remove('fade-in');
-        
-        const screen1 = document.getElementById('screen-1');
-        screen1.style.display = 'block';
-        screen1.classList.add('fade-in');
-
-        // 4. Reset Data
-        photoIndex = 0;
-        document.getElementById('slideshow').src = photos[0];
-        
-        // 5. Reset "No" Button Position
-        // We remove the style attribute to strip 'position: fixed' and coordinates
-        document.getElementById('noBtn').removeAttribute('style');
-    }
-
     function rotatePhoto() {
         const imgElement = document.getElementById('slideshow');
         imgElement.classList.add('fade-out');
@@ -302,15 +309,14 @@
         }, 500); 
     }
 
-    // --- 3. ANIMATION LOGIC ---
     function startEmojiRain(intervalTime) {
         const id = setInterval(createEmoji, intervalTime);
-        intervalIds.push(id);
+        emojiIntervals.push(id);
     }
 
-    function clearIntervals() {
-        intervalIds.forEach(id => clearInterval(id));
-        intervalIds = [];
+    function clearEmojiIntervals() {
+        emojiIntervals.forEach(id => clearInterval(id));
+        emojiIntervals = [];
     }
 
     function createEmoji() {
