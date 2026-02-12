@@ -125,7 +125,8 @@
     .btn-no {
         background: #ff4757;
         color: white;
-        transition: background-color 0.3s ease; 
+        /* RESTORED THE SMOOTH ANIMATION HERE: */
+        transition: all 0.3s ease; 
     }
 
     .btn-no.transformed {
@@ -247,11 +248,10 @@
     const emojis = ["❤️", "🦦", "🐶", "💖", "🥰"]; 
 
     function revealMessage() {
-        // --- PLAY MUSIC HERE ---
         const music = document.getElementById('bg-music');
         if(music) {
-            music.volume = 0.5; // Set volume to 50%
-            music.play().catch(e => console.log("Audio play failed (browser might blocked it):", e));
+            music.volume = 0.5; 
+            music.play().catch(e => console.log("Audio play failed:", e));
         }
         
         document.getElementById('screen-1').classList.add('hidden');
