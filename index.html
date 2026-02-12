@@ -125,24 +125,25 @@
     .btn-no {
         background: #ff4757;
         color: white;
-        transition: top 0.2s ease, left 0.2s ease, background-color 0.3s ease; 
+        transition: background-color 0.3s ease; /* Removed top/left transition for snappier movement */
     }
 
     /* Styles for when No turns into Yes */
     .btn-no.transformed {
         background: #2ed573 !important;
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     .photo-container {
-        width: 250px;         
-        height: 300px;  
+        width: 250px;          
+        height: 300px;   
         border-radius: 15px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         margin-top: 10px;
         border: 5px solid #fff;
         background-color: #eee;
         overflow: hidden; 
-        flex-shrink: 0;   
+        flex-shrink: 0;    
         position: relative;
         margin-left: auto;
         margin-right: auto;
@@ -150,8 +151,8 @@
 
     .couple-photo {
         width: 100%;        
-        height: 100%;       
-        object-fit: cover;  
+        height: 100%;        
+        object-fit: cover;   
         transition: opacity 0.5s ease-in-out;
         opacity: 1;
         display: block;
@@ -261,75 +262,110 @@
     }
 
     function restartSite() {
-        location.reload(); // Simplest way to reset all states and counters
+        location.reload(); 
     }
 
     function handleNoClick(e) {
+        // If it's transformed to YES, treat as success
         if (isNoTransformed) {
             celebrate();
         } else {
+            // Otherwise, move it
             moveButton(e);
         }
     }
 
     function moveButton(e) {
         if (isNoTransformed) return;
+        
+        // Prevent default touch behavior to stop double-firing
         if(e && e.type === 'touchstart') e.preventDefault();
         
         noClickCount++;
         const noBtn = document.getElementById('noBtn');
         const yesBtn = document.getElementById('yesBtn');
 
-        // Check for transformation
+        // Check for transformation to YES (after 5 attempts)
         if (noClickCount >= 5) {
             isNoTransformed = true;
             noBtn.innerHTML = "כן! ❤️";
             noBtn.classList.add('transformed');
             noBtn.style.position = 'static';
-            noBtn.style.left = 'auto';
-            noBtn.style.top = 'auto';
             noBtn.style.transform = 'scale(1)';
+            // Remove manual positioning
+            noBtn.style.left = '';
+            noBtn.style.top = '';
             return;
         }
         
-        // Scale Yes Button
-        yesScale += 0.15;
-        yesBtn.style.transform = `scale(${yesScale})`;
+        // Scale Yes Button (Cap it at 2.5x so it doesn't eat the screen)
+        if (yesScale < 2.5) {
+            yesScale += 0.15;
+            yesBtn.style.transform = `scale(${yesScale})`;
+        }
 
+        // --- THE FIX STARTS HERE ---
+        
         noBtn.style.position = 'fixed'; 
         noBtn.style.zIndex = '9999'; 
 
-        const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-        const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+        // 1. Get accurate Viewport dimensions
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
         
-        const btnWidth = noBtn.offsetWidth;
-        const btnHeight = noBtn.offsetHeight;
+        // 2. Get accurate Button dimensions
+        const btnW = noBtn.offsetWidth;
+        const btnH = noBtn.offsetHeight;
+        
+        // 3. Define the Safe Area (Screen size minus button size minus padding)
+        const maxLeft = vw - btnW - 20;
+        const maxTop = vh - btnH - 20;
+        
+        // 4. Get Yes Button rect for collision detection
         const yesRect = yesBtn.getBoundingClientRect();
+        const buffer = 20;
 
         let newX, newY;
         let isOverlapping = true;
         let attempts = 0;
 
+        // Try 50 times to find a spot that doesn't overlap YES
         while (isOverlapping && attempts < 50) {
-            // Keep button 20px away from screen edges
-            newX = Math.random() * (vw - btnWidth - 40) + 20;
-            newY = Math.random() * (vh - btnHeight - 40) + 20;
+            // Generate random within safe bounds
+            newX = Math.random() * maxLeft;
+            newY = Math.random() * maxTop;
 
-            // Check overlap with Yes Button (including a safety buffer)
-            const buffer = 30;
+            // Ensure we are at least 10px from edge (min)
+            if (newX < 10) newX = 10;
+            if (newY < 10) newY = 10;
+
+            // Check collision with Yes button
             const overlapsYes = !(
-                newX + btnWidth + buffer < yesRect.left || 
+                newX + btnW + buffer < yesRect.left || 
                 newX - buffer > yesRect.right || 
-                newY + btnHeight + buffer < yesRect.top || 
+                newY + btnH + buffer < yesRect.top || 
                 newY - buffer > yesRect.bottom
             );
 
-            if (!overlapsYes) isOverlapping = false;
+            if (!overlapsYes) {
+                isOverlapping = false;
+            }
             attempts++;
         }
 
-        noBtn.style.left = newX + 'px';
-        noBtn.style.top = newY + 'px';
+        // 5. SAFETY CLAMP: Even if the loop failed (because Yes is too big),
+        // we force the coordinates to stay on screen.
+        // We use Math.min/Math.max to guarantee it never exceeds bounds.
+        
+        // Clamp X between 10 and maxLeft
+        const safeX = Math.max(10, Math.min(newX, maxLeft));
+        
+        // Clamp Y between 10 and maxTop
+        const safeY = Math.max(10, Math.min(newY, maxTop));
+
+        // Apply
+        noBtn.style.left = safeX + 'px';
+        noBtn.style.top = safeY + 'px';
     }
 
     function rotatePhoto() {
@@ -367,4 +403,3 @@
 
 </body>
 </html>
-
