@@ -26,7 +26,7 @@
         background: linear-gradient(135deg, var(--bg-1), var(--bg-2), #fbc2eb);
         background-size: 400% 400%;
         animation: gradientBG 15s ease infinite;
-        font-family: 'Rubik', sans-serif; /* Clean Hebrew font */
+        font-family: 'Rubik', sans-serif;
         overflow: hidden;
         position: relative;
     }
@@ -50,19 +50,19 @@
         width: 90%; 
         max-width: 350px; 
         position: relative;
-        z-index: 10;
+        z-index: 100; /* High z-index for the card */
     }
 
     h1 {
-        font-family: 'Amatic SC', cursive; /* Handwritten Hebrew font */
-        font-size: 2.8rem; /* Made slightly bigger for Amatic */
+        font-family: 'Amatic SC', cursive;
+        font-size: 3rem; 
         margin-bottom: 10px;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         font-weight: 700;
     }
 
     p {
-        font-size: 1.2rem;
+        font-size: 1.3rem;
         line-height: 1.4;
         margin-bottom: 25px;
         text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
@@ -81,6 +81,8 @@
         outline: none;
         box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         -webkit-tap-highlight-color: transparent;
+        position: relative;
+        z-index: 200;
     }
 
     .btn-primary {
@@ -93,17 +95,16 @@
     .btn-yes {
         background: #2ed573;
         color: white;
-        z-index: 20;
-        position: relative;
     }
 
     .btn-no {
         background: #ff4757;
         color: white;
-        z-index: 50; 
-        transition: top 0.3s ease, left 0.3s ease; 
+        /* Ensure it's always clickable/visible */
+        transition: top 0.2s ease, left 0.2s ease; 
     }
 
+    /* Slideshow Styling */
     .couple-photo {
         width: 100%;
         max-width: 280px;
@@ -136,8 +137,26 @@
         z-index: 1; 
     }
 
-    @keyframes floatUp {
-        to { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
+    /* NEW ANIMATION: Float Up + Sway Side to Side */
+    @keyframes floatUpAndSway {
+        0% { 
+            transform: translateY(0) translateX(0); 
+            opacity: 1; 
+        }
+        25% { 
+            transform: translateY(-30vh) translateX(15px); 
+        }
+        50% { 
+            transform: translateY(-60vh) translateX(-15px); 
+        }
+        75% { 
+            transform: translateY(-90vh) translateX(10px); 
+            opacity: 0.8;
+        }
+        100% { 
+            transform: translateY(-120vh) translateX(0); 
+            opacity: 0; 
+        }
     }
 </style>
 </head>
@@ -156,8 +175,7 @@
         <p>את עושה את העולם שלי שמח יותר.<br>האם תהיי הולנטיין שלי?</p>
         <div style="display: flex; justify-content: center; flex-wrap: wrap; position: relative;">
             <button class="btn btn-yes" onclick="celebrate()">כן! ❤️</button>
-            
-            <button class="btn btn-no" id="noBtn" onmouseover="moveButton()" ontouchstart="moveButton()" onclick="moveButton()">לא 😢</button>
+            <button class="btn btn-no" id="noBtn" onmouseover="moveButton(event)" ontouchstart="moveButton(event)" onclick="moveButton(event)">לא 😢</button>
         </div>
     </div>
 
@@ -193,26 +211,40 @@
         startEmojiRain(800); 
     }
 
-    // --- SMART MOBILE BUTTON MOVE ---
-    function moveButton() {
+    // --- FIX: BUTTON MOVEMENT LOGIC ---
+    function moveButton(e) {
+        // Prevent default touch behavior (prevents double-firing on some phones)
+        if(e && e.type === 'touchstart') e.preventDefault();
+        
         const btn = document.getElementById('noBtn');
         
-        const btnWidth = btn.offsetWidth;
-        const btnHeight = btn.offsetHeight;
-        
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
-
-        // Ensure button stays within screen bounds (LTR logic works fine for positioning)
-        const maxLeft = windowWidth - btnWidth - 20;
-        const maxTop = windowHeight - btnHeight - 20;
-
-        const newLeft = Math.max(10, Math.random() * maxLeft);
-        const newTop = Math.max(10, Math.random() * maxTop);
-
+        // Force button to fixed position immediately
         btn.style.position = 'fixed'; 
-        btn.style.left = newLeft + 'px';
-        btn.style.top = newTop + 'px';
+        btn.style.zIndex = '9999'; // Ensure it's on TOP of everything
+
+        // Get window size
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        
+        // Get button size (approximate if not rendered yet, but usually is)
+        const btnW = btn.offsetWidth || 80;
+        const btnH = btn.offsetHeight || 40;
+
+        // CALCULATE SAFE ZONE
+        // We only move the button within 10% to 80% of the screen
+        // This prevents it from hitting the very edges
+        const minX = w * 0.1;
+        const maxX = w * 0.8 - btnW;
+        
+        const minY = h * 0.1;
+        const maxY = h * 0.8 - btnH;
+
+        // Random position within safe zone
+        const newX = minX + Math.random() * (maxX - minX);
+        const newY = minY + Math.random() * (maxY - minY);
+
+        btn.style.left = newX + 'px';
+        btn.style.top = newY + 'px';
     }
 
     function celebrate() {
@@ -224,7 +256,6 @@
         clearIntervals();
         startEmojiRain(100); 
         
-        // --- 4 Seconds per slide ---
         setInterval(rotatePhoto, 4000); 
     }
 
@@ -240,7 +271,7 @@
         }, 500); 
     }
 
-    // --- 3. ANIMATION LOGIC ---
+    // --- 3. ANIMATION LOGIC (UPDATED) ---
     function startEmojiRain(intervalTime) {
         const id = setInterval(createEmoji, intervalTime);
         intervalIds.push(id);
@@ -255,10 +286,18 @@
         const emoji = document.createElement("div");
         emoji.classList.add("floater");
         emoji.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+        
+        // Random horizontal start position
         emoji.style.left = Math.random() * 100 + "vw";
+        
+        // Random size
         emoji.style.fontSize = (Math.random() * 20 + 30) + "px";
-        const duration = Math.random() * 3 + 4; 
-        emoji.style.animation = `floatUp ${duration}s linear forwards`;
+        
+        const duration = Math.random() * 3 + 4; // Between 4 and 7 seconds
+        
+        // Apply the new Sway animation
+        emoji.style.animation = `floatUpAndSway ${duration}s linear forwards`;
+        
         document.body.appendChild(emoji);
         setTimeout(() => { emoji.remove(); }, duration * 1000);
     }
