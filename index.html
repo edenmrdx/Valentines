@@ -90,6 +90,9 @@
         -webkit-tap-highlight-color: transparent;
         position: relative;
         z-index: 200;
+        /* FIX 1: Prevent shape shifting */
+        white-space: nowrap; 
+        min-width: 80px; 
     }
 
     .btn-yes {
@@ -115,22 +118,36 @@
         transition: top 0.2s ease, left 0.2s ease; 
     }
 
-    /* Fixed Image Sizing */
-    .couple-photo {
-        width: 250px;       
-        height: 300px;      
-        object-fit: cover;  
+    /* FIX 3: Container to prevent vibration/shaking */
+    .photo-container {
+        width: 250px;        
+        height: 300px;  
         border-radius: 15px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         margin-top: 10px;
         border: 4px solid white;
+        background-color: rgba(255,255,255,0.3);
+        overflow: hidden; /* Ensures image stays inside border radius */
+        flex-shrink: 0;   /* Prevents container from squishing */
+        position: relative;
+    }
+
+    .couple-photo {
+        width: 100%;       
+        height: 100%;      
+        object-fit: cover;  
         transition: opacity 0.5s ease-in-out;
         opacity: 1;
-        background-color: rgba(255,255,255,0.3);
+        display: block;
+    }
+
+    /* FIX 3: Defined the missing class for the transition */
+    .fade-out {
+        opacity: 0;
     }
 
     .hidden {
-        display: none !important; /* Forces hiding to prevent conflicts */
+        display: none !important; 
     }
     
     .fade-in {
@@ -192,7 +209,9 @@
     <div id="screen-3" class="hidden">
         <h1>ישששש!! 🎇🥂💐</h1>
         
-        <img src="us1.jpg" alt="Us" class="couple-photo" id="slideshow">
+        <div class="photo-container">
+            <img src="us1.jpg" alt="Us" class="couple-photo" id="slideshow">
+        </div>
         
         <p style="margin-top: 20px;">הולנטיין הכי טוב אי פעם! ❤️</p>
         
@@ -205,7 +224,7 @@
     const photos = ["us1.jpg", "us2.jpg", "us3.jpg", "us4.jpg"];
     let photoIndex = 0;
     let slideshowInterval; 
-    let emojiIntervals = []; // Renamed for clarity
+    let emojiIntervals = []; 
     const emojis = ["❤️", "🦦", "🐶", "💖", "🦦", "🥰"]; 
 
     // Preload images
@@ -216,11 +235,9 @@
 
     // --- STEP 1: REVEAL QUESTION ---
     function revealMessage() {
-        // Hide Screen 1
         const s1 = document.getElementById('screen-1');
         s1.classList.add('hidden');
 
-        // Show Screen 2
         const s2 = document.getElementById('screen-2');
         s2.classList.remove('hidden');
         s2.classList.add('fade-in');
@@ -230,44 +247,36 @@
 
     // --- STEP 2: CELEBRATE ---
     function celebrate() {
-        // Hide Screen 2
         const s2 = document.getElementById('screen-2');
         s2.classList.add('hidden');
 
-        // Show Screen 3
         const s3 = document.getElementById('screen-3');
         s3.classList.remove('hidden');
         s3.classList.add('fade-in');
 
-        // Stop light rain, start heavy rain
         clearEmojiIntervals();
         startEmojiRain(100); 
         
-        // Start Slideshow
         slideshowInterval = setInterval(rotatePhoto, 4000); 
     }
 
-    // --- RESTART LOGIC (FIXED) ---
+    // --- RESTART LOGIC ---
     function restartSite() {
-        // 1. Stop all timers
         clearInterval(slideshowInterval);
         clearEmojiIntervals();
 
-        // 2. Hide Screens 2 & 3
         document.getElementById('screen-2').classList.add('hidden');
         document.getElementById('screen-3').classList.add('hidden');
         document.getElementById('screen-3').classList.remove('fade-in');
 
-        // 3. Show Screen 1
         const s1 = document.getElementById('screen-1');
         s1.classList.remove('hidden');
         s1.classList.add('fade-in');
 
-        // 4. Reset Data
         photoIndex = 0;
         document.getElementById('slideshow').src = photos[0];
+        document.getElementById('slideshow').classList.remove('fade-out'); // Reset opacity
         
-        // 5. Reset "No" Button (Remove fixed positioning)
         document.getElementById('noBtn').removeAttribute('style');
     }
 
@@ -277,19 +286,24 @@
         
         const btn = document.getElementById('noBtn');
         
+        // FIX 2: Get ACTUAL button dimensions (not hardcoded)
+        const rect = btn.getBoundingClientRect();
+        const btnW = rect.width;
+        const btnH = rect.height;
+
         // Enable fixed positioning
         btn.style.position = 'fixed'; 
         btn.style.zIndex = '9999'; 
 
         const w = window.innerWidth;
         const h = window.innerHeight;
-        const btnW = 100; 
-        const btnH = 50;
 
-        const minX = 20;
-        const maxX = w - btnW - 20;
-        const minY = 20;
-        const maxY = h - btnH - 20;
+        // FIX 2: Buffer to keep button fully on screen
+        const buffer = 20; 
+        const minX = buffer;
+        const maxX = w - btnW - buffer;
+        const minY = buffer;
+        const maxY = h - btnH - buffer;
 
         const newX = Math.random() * (maxX - minX) + minX;
         const newY = Math.random() * (maxY - minY) + minY;
@@ -305,7 +319,14 @@
         setTimeout(() => {
             photoIndex = (photoIndex + 1) % photos.length; 
             imgElement.src = photos[photoIndex];
-            imgElement.classList.remove('fade-out');
+            
+            // Wait slightly for image decode, then fade in
+            imgElement.onload = () => {
+                imgElement.classList.remove('fade-out');
+            };
+            // Fallback in case onload misses (cached)
+            setTimeout(() => imgElement.classList.remove('fade-out'), 50);
+            
         }, 500); 
     }
 
