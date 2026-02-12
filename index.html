@@ -6,8 +6,6 @@
 <title>For Zozy ❤️</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
 
-<link rel="preload" href="us.jpg" as="image">
-
 <style>
     :root {
         --primary: #ff6b81;
@@ -29,7 +27,6 @@
         position: relative;
     }
 
-    /* Animated background */
     @keyframes gradientBG {
         0% { background-position: 0% 50%; }
         50% { background-position: 100% 50%; }
@@ -67,7 +64,6 @@
         text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     }
 
-    /* Buttons */
     .btn {
         padding: 15px 30px;
         font-size: 1.2rem;
@@ -98,7 +94,7 @@
         color: white;
     }
 
-    /* Image Styling */
+    /* Slideshow Styling */
     .couple-photo {
         width: 100%;
         max-width: 280px;
@@ -107,16 +103,17 @@
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         margin-top: 10px;
         border: 4px solid white;
-        animation: popIn 0.5s ease;
+        
+        /* Smooth Transition for the image swap */
+        transition: opacity 0.5s ease-in-out;
+        opacity: 1;
     }
 
-    @keyframes popIn {
-        0% { transform: scale(0); opacity: 0; }
-        80% { transform: scale(1.1); opacity: 1; }
-        100% { transform: scale(1); }
+    /* Helper class to hide image during swap */
+    .fade-out {
+        opacity: 0;
     }
 
-    /* Visibility Helpers */
     .hidden { display: none; }
     
     .fade-in {
@@ -128,13 +125,12 @@
         to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Floating elements (emojis) */
     .floater {
         position: absolute;
         bottom: -50px;
         pointer-events: none;
         user-select: none;
-        z-index: 1; /* Behind container usually */
+        z-index: 1; 
     }
 
     @keyframes floatUp {
@@ -164,40 +160,39 @@
     <div id="screen-3" class="hidden">
         <h1>YAY!!! 🎇🥂💐</h1>
         
-        <img src="us.jpg" alt="Us" class="couple-photo">
+        <img src="us1.jpg" alt="Us" class="couple-photo" id="slideshow">
         
         <p style="margin-top: 20px;">Best Valentine Ever! ❤️</p>
     </div>
 </div>
 
 <script>
-    // --- 2. JAVASCRIPT PRELOADER ---
-    // This forces the browser to download 'us.jpg' immediately in the background
-    const preloadImage = new Image();
-    preloadImage.src = "us.jpg";
+    // --- 1. SLIDESHOW CONFIGURATION ---
+    const photos = ["us1.jpg", "us2.jpg", "us3.jpg"];
+    let photoIndex = 0;
+    
+    // Preload all images immediately so they don't lag
+    photos.forEach(src => {
+        const img = new Image();
+        img.src = src;
+    });
 
-    // --- Configuration ---
+    // --- 2. MAIN LOGIC ---
     const emojis = ["❤️", "🦦", "🐶", "💖", "🦦", "🥰"]; 
     let intervalIds = [];
-
-    // --- Interaction Functions ---
 
     function revealMessage() {
         document.getElementById('screen-1').style.display = 'none';
         const screen2 = document.getElementById('screen-2');
         screen2.classList.remove('hidden');
         screen2.classList.add('fade-in');
-        
-        // Start gentle background rain
         startEmojiRain(800); 
     }
 
     function moveButton() {
         const btn = document.getElementById('noBtn');
-        
         const x = Math.random() * (window.innerWidth - 100);
         const y = Math.random() * (window.innerHeight - 50);
-
         btn.style.position = 'fixed'; 
         btn.style.left = x + 'px';
         btn.style.top = y + 'px';
@@ -211,14 +206,28 @@
 
         clearIntervals();
         startEmojiRain(100); // Fast rain
+        
+        // Start the picture rotation
+        setInterval(rotatePhoto, 3000); // Change photo every 3 seconds
     }
 
-    // --- Animation Logic ---
+    function rotatePhoto() {
+        const imgElement = document.getElementById('slideshow');
+        
+        // 1. Fade out
+        imgElement.classList.add('fade-out');
 
+        // 2. Wait 500ms (half a second), then switch image and fade back in
+        setTimeout(() => {
+            photoIndex = (photoIndex + 1) % photos.length; // Loop back to 0
+            imgElement.src = photos[photoIndex];
+            imgElement.classList.remove('fade-out');
+        }, 500); 
+    }
+
+    // --- 3. ANIMATION LOGIC ---
     function startEmojiRain(intervalTime) {
-        const id = setInterval(() => {
-            createEmoji();
-        }, intervalTime);
+        const id = setInterval(createEmoji, intervalTime);
         intervalIds.push(id);
     }
 
@@ -231,15 +240,11 @@
         const emoji = document.createElement("div");
         emoji.classList.add("floater");
         emoji.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
-        
         emoji.style.left = Math.random() * 100 + "vw";
         emoji.style.fontSize = (Math.random() * 20 + 30) + "px";
-        
         const duration = Math.random() * 3 + 4; 
         emoji.style.animation = `floatUp ${duration}s linear forwards`;
-        
         document.body.appendChild(emoji);
-
         setTimeout(() => { emoji.remove(); }, duration * 1000);
     }
 </script>
