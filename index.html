@@ -212,6 +212,7 @@
             אנחנו נמצאים בנקודות שונות על כדור הארץ,
             אבל בולנטיין הזה אני מרגיש קרוב אלייך מתמיד.
         </p>
+        <p>
             חשוב לי שתדעי שאין כמוך בעולם,
             את הכל בשבילי,
             ואני אוהב אותך הכי שיש!
@@ -273,6 +274,11 @@
         }
 
         document.getElementById('screen-2').classList.add('hidden');
+        
+        // תיקון: הסתרת כפתור ה-לא באופן ספציפי
+        const noBtn = document.getElementById('noBtn');
+        if(noBtn) noBtn.classList.add('hidden');
+
         const s3 = document.getElementById('screen-3');
         s3.classList.remove('hidden');
         s3.classList.add('fade-in');
@@ -302,6 +308,10 @@
 
         noBtn.innerHTML = "לא 😞";
         noBtn.classList.remove('transformed');
+        
+        // תיקון: הסרת המחלקה hidden כדי שהכפתור יחזור להופיע
+        noBtn.classList.remove('hidden');
+        
         noBtn.style.position = 'static'; 
         noBtn.style.left = '';
         noBtn.style.top = '';
@@ -467,9 +477,3 @@
 
 </body>
 </html>
-
-
-
-
-
-
