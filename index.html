@@ -27,7 +27,7 @@
         background-size: 400% 400%;
         animation: gradientBG 15s ease infinite;
         font-family: 'Rubik', sans-serif;
-        overflow: hidden;
+        overflow: hidden; /* מונע גלילה של הרקע עצמו */
         position: relative;
     }
 
@@ -44,32 +44,30 @@
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.18);
-        padding: 20px 15px; /* הקטנו מעט את ה-padding */
+        padding: 20px 15px;
         border-radius: 20px;
         box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        width: 90%; 
+        
+        width: 85%; 
         max-width: 350px; 
         
-        /* שינויים לטיפול גובה המסך */
-        max-height: 90vh; /* מגביל את גובה הכרטיס ל-90% מהמסך */
-        overflow-y: auto; /* מאפשר גלילה בתוך הכרטיס אם התוכן ארוך */
+        /* הגדרות קריטיות לגלילה בטלפון */
+        max-height: 85vh; /* לא תופס יותר מ-85% גובה מסך */
+        overflow-y: auto; /* מאפשר גלילה */
+        -webkit-overflow-scrolling: touch; /* גלילה חלקה באייפון */
         
         position: relative;
         z-index: 100;
         display: flex;
         flex-direction: column;
         align-items: center;
-        min-height: 400px; 
-        justify-content: center; /* מרכז תוכן אנכית */
+        
+        /* ברירת מחדל: מרכוז (למסכים הראשונים) */
+        justify-content: center; 
         transition: all 0.5s ease;
     }
-    
-    /* הסתרת פס גלילה אבל השארת יכולת הגלילה */
-    .container::-webkit-scrollbar {
-        width: 0px;
-        background: transparent;
-    }
 
+    /* כשהופכים למצב מלא (מסך 3), מבטלים את המרכוז כדי לאפשר גלילה */
     .container.solid-mode {
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: none;
@@ -77,14 +75,25 @@
         border: none;
         color: #ff6b81;
         box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-        justify-content: flex-start; /* במסך הסיום התוכן מתחיל מלמעלה */
-        padding-top: 30px;
+        
+        justify-content: flex-start; /* מתחיל מלמעלה */
+        padding-top: 25px;
+        padding-bottom: 40px; /* אקסטרה מקום למטה */
+    }
+
+    /* הסתרת פס הגלילה המכוער, אבל הגלילה עדיין עובדת */
+    .container::-webkit-scrollbar {
+        width: 4px;
+    }
+    .container::-webkit-scrollbar-thumb {
+        background-color: rgba(0,0,0,0.1);
+        border-radius: 4px;
     }
 
     h1 {
         font-family: 'Amatic SC', cursive;
-        font-size: 3rem; 
-        margin-bottom: 5px; /* רווח קטן יותר */
+        font-size: 2.5rem; /* הוקטן מעט */
+        margin-bottom: 5px;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         font-weight: 700;
         line-height: 1;
@@ -92,9 +101,9 @@
     }
 
     p {
-        font-size: 1.1rem; 
-        line-height: 1.4; /* שורות צפופות קצת יותר */
-        margin-bottom: 15px;
+        font-size: 1rem; /* הוקטן מעט */
+        line-height: 1.3;
+        margin-bottom: 12px;
         text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         white-space: pre-line; 
     }
@@ -104,8 +113,8 @@
     }
 
     .btn {
-        padding: 10px 25px;
-        font-size: 1.1rem;
+        padding: 8px 20px; /* כפתורים קומפקטיים יותר */
+        font-size: 1rem;
         border: none;
         border-radius: 50px;
         cursor: pointer;
@@ -119,48 +128,42 @@
         position: relative;
         z-index: 200;
         white-space: nowrap; 
-        min-width: 80px; 
     }
 
     .btn-yes {
         background: #2ed573;
         color: white;
-        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     
     .btn-restart {
         background: #ff6b81;
         border: none;
         color: white;
-        margin-top: 10px;
-        font-size: 1rem;
-        margin-bottom: 10px; /* רווח תחתון */
+        margin-top: 15px;
+        width: 80%; /* כפתור רחב שקל ללחוץ */
+        margin-bottom: 10px;
     }
     
     .btn-no {
         background: #ff4757;
         color: white;
-        transition: all 0.2s ease;
     }
 
     .btn-no.transformed {
         background: #2ed573 !important;
-        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     .photo-container {
-        width: 200px; /* הקטנו רוחב */          
-        height: 200px; /* הקטנו גובה מ-300 ל-200 כדי לחסוך מקום */   
+        width: 150px; /* הוקטן משמעותית כדי לחסוך מקום */          
+        height: 150px;   
         border-radius: 15px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        margin-top: 5px;
+        margin: 5px auto;
         border: 4px solid #fff;
         background-color: #eee;
         overflow: hidden; 
         flex-shrink: 0;     
         position: relative;
-        margin-left: auto;
-        margin-right: auto;
     }
 
     .couple-photo {
@@ -210,27 +213,28 @@
         100% { transform: translate(-50%, -150px) scale(1.5); opacity: 0; }
     }
 
-    /* === סגנונות חדשים ומצומצמים === */
+    /* === אזור השעון הקומפקטי === */
     .countdown-wrapper {
         display: flex;
         justify-content: center;
         gap: 8px;
-        margin: 10px 0; /* פחות רווח */
+        margin: 8px 0;
         background: rgba(255,230,230, 0.5);
         padding: 5px 10px;
         border-radius: 10px;
+        width: 90%; /* שלא יחרוג */
     }
     
     .countdown-item {
         display: flex;
         flex-direction: column;
         align-items: center;
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         color: #555;
     }
     
     .countdown-number {
-        font-size: 1.2rem; /* פונט קצת יותר קטן */
+        font-size: 1.1rem;
         font-weight: bold;
         color: #ff6b81;
     }
@@ -238,18 +242,17 @@
     .btn-reasons {
         background: #a29bfe;
         color: white;
-        font-size: 0.95rem;
-        padding: 8px 16px;
+        font-size: 0.9rem;
+        padding: 8px 15px;
         margin-top: 5px;
     }
 
     .reason-text {
-        min-height: 40px; /* הקטנו גובה מינימלי */
+        min-height: 40px;
         font-size: 1.1rem;
         color: #6c5ce7;
         font-weight: bold;
-        margin-top: 5px;
-        margin-bottom: 5px;
+        margin: 5px 0;
         transition: opacity 0.3s;
         line-height: 1.2;
     }
@@ -282,7 +285,7 @@
 
     <div id="screen-2" class="hidden">
         <h1>❤️✨</h1>
-        <p style="font-size: 1.5rem; font-weight: bold;">האם תהיי הולנטיין שלי?</p>
+        <p style="font-size: 1.4rem; font-weight: bold;">האם תהיי הולנטיין שלי?</p>
         
         <div id="btn-wrapper" style="display: flex; justify-content: center; flex-wrap: wrap; position: relative; width: 100%; min-height: 100px;">
             <button class="btn btn-yes" id="yesBtn" onclick="celebrate()">כן! ❤️</button>
@@ -315,7 +318,7 @@
             </div>
         </div>
 
-        <p style="margin-top: 5px; margin-bottom: 5px; font-size: 0.95rem;">
+        <p style="margin-top: 5px; margin-bottom: 5px; font-size: 0.9rem;">
             ב- 14/02 בשעה 22:00 (שעון הפיליפינים)
             ניפגש לדייט וידאו רומנטי!
         </p>
@@ -369,7 +372,13 @@
         const s3 = document.getElementById('screen-3');
         s3.classList.remove('hidden');
         s3.classList.add('fade-in');
-        document.getElementById('main-card').classList.add('solid-mode');
+        
+        // כאן הקסם קורה: משנים את עימוד הכרטיס כדי לאפשר גלילה תקינה
+        const card = document.getElementById('main-card');
+        card.classList.add('solid-mode');
+        // נגלול למעלה ליתר ביטחון
+        card.scrollTop = 0;
+
         clearEmojiIntervals();
         startEmojiRain(100); 
         slideshowInterval = setInterval(rotatePhoto, 4000); 
@@ -419,8 +428,11 @@
     function restartSite() {
         document.getElementById('screen-3').classList.add('hidden');
         document.getElementById('screen-1').classList.remove('hidden');
-        document.getElementById('main-card').classList.remove('solid-mode');
-
+        
+        // ביטול מצב גלילה וחזרה למרכז
+        const card = document.getElementById('main-card');
+        card.classList.remove('solid-mode');
+        
         clearInterval(slideshowInterval);
         clearInterval(countdownInterval); 
         document.getElementById('reason-display').innerHTML = ""; 
@@ -582,14 +594,12 @@
         heart.classList.add('click-heart');
         heart.innerHTML = "❤️";
         
-        // Random position near the click
         const offsetX = (Math.random() - 0.5) * 50;
         const offsetY = (Math.random() - 0.5) * 50;
         
         heart.style.left = (e.clientX + offsetX) + 'px';
         heart.style.top = (e.clientY + offsetY) + 'px';
         
-        // Random size and rotation
         const size = Math.random() * 20 + 10;
         heart.style.fontSize = size + 'px';
         heart.style.transform = `rotate(${Math.random() * 360}deg)`;
